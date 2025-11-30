@@ -23,6 +23,13 @@ class User(db.Model):
         self.role = role
         self.bio = bio
 
+    def get_string(self):
+        print(self.username)
+        print(self.password)
+        print(self.role)
+        print(self.bio)
+        print("--------------------")
+
 
 
 

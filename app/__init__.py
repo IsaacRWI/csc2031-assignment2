@@ -16,6 +16,7 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    csrf.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
@@ -29,6 +30,7 @@ def create_app():
         from .models import User
         db.drop_all()
         db.create_all()
+        # counter = 0
 
         users = [
             {"username": "user1@email.com", "password": "Userpass!23", "role": "user", "bio": "I'm a basic user"},
@@ -36,10 +38,13 @@ def create_app():
             {"username": "admin1@email.com", "password": "Adminpass!23", "role": "admin", "bio": "I'm an administrator"}
         ]
 
-        for user in users:
-            user = User(username=user["username"], password=user["password"], role=user["role"], bio=user["bio"])
+        for i in users:
+            user = User(username=i["username"], password="placeholder", role=i["role"], bio=i["bio"])
+            user.hash_password(i["password"])
+            # user.get_string()
             db.session.add(user)
             db.session.commit()
-
+            # counter += 1
+    # print(counter)
     return app
 
