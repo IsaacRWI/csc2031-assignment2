@@ -13,9 +13,14 @@
 {% endwith %}
 
 <form method="POST" novalidate>
-  Username: <input type="text" name="username"><br>
-  Password: <input type="password" name="password"><br>
-  <input type="submit" value="Login">
+  {{ form.hidden_tag() }}
+  {{ form.username.label }}<br>
+  {{ form.username(size=32) }}<br>
+
+  {{ form.password.label }}<br>
+  {{ form.password(size=32) }}<br>
+
+  {{ form.submit() }}
 </form>
 {% endblock %}
 

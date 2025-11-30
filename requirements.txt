@@ -5,3 +5,5 @@ flask-wtf
 flask-login
 wtforms
 bleach
+bcrypt
+flask-bcrypt

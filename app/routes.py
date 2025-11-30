@@ -1,8 +1,11 @@
 import traceback
 from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort
 from sqlalchemy import text
-from app import db
+from app import db, login_manager
 from app.models import User
+from app.forms import LoginForm
+from flask_login import login_user, current_user, logout_user, login_required
+from uuid import uuid4
 
 main = Blueprint('main', __name__)
 
@@ -12,27 +15,22 @@ def home():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        row = db.session.execute(text(f"SELECT * FROM user WHERE username = '{username}' AND password = '{password}'")).mappings().first()
-        if row:
-            user = db.session.get(User, row['id'])  # creates a User object
-            session['user'] = user.username
-            session['role'] = user.role
-            session['bio'] = user.bio
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first() if form.username.data else None
+        if user.check_password(form.password.data):
+            regenerate_session()
+            login_user(user)
+            print("successful login")
             return redirect(url_for('main.dashboard'))
         else:
-            flash('Login credentials are invalid, please try again')
-    return render_template('login.html')
+            flash("Login credentials are invalid, please try again")
+    return render_template('login.html', form=form)
+
 
 @main.route('/dashboard')
 def dashboard():
-    if 'user' in session:
-        username = session['user']
-        bio = session['bio']
-        return render_template('dashboard.html', username=username, bio=bio)
-    return redirect(url_for('main.login'))
+    return render_template('dashboard.html', username=current_user.username, bio=current_user.bio)
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -105,4 +103,10 @@ def change_password():
 
     return render_template('change_password.html')
 
+def regenerate_session():
+    session.clear()
+    session["csrf_token"] = uuid4().hex
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
