@@ -4,6 +4,14 @@ from config import Config
 from flask_wtf import CSRFProtect
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
+from cryptography.fernet import Fernet
+import os
+from dotenv import load_dotenv
+
+# initializing Fernet to encrypt bio
+load_dotenv()
+FERNET_KEY = os.getenv("FERNET_KEY")
+fernet = Fernet(FERNET_KEY)
 
 # initialize flask extensions for later use
 db = SQLAlchemy()
@@ -39,7 +47,7 @@ def create_app():
         ]
 
         for i in users:
-            user = User(username=i["username"], password="placeholder", role=i["role"], bio=i["bio"])
+            user = User(username=i["username"], password="placeholder", role=i["role"], bio=fernet.encrypt((i["bio"]).encode()))
             user.hash_password(i["password"])
             # user.get_string()
             db.session.add(user)
