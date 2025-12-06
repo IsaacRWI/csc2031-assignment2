@@ -37,7 +37,7 @@ def dashboard():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, password="placeholder", role="user",bio=fernet.encrypt(form.bio.encode()))
+        user = User(username=form.username.data, password="placeholder", role="user",bio=fernet.encrypt(form.bio.data.encode()))
         user.hash_password(form.password.data)
         user.get_string()
         db.session.add(user)
