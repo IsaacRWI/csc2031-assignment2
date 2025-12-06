@@ -29,6 +29,7 @@ def login():
 
 
 @main.route('/dashboard')
+@login_required
 def dashboard():
     return render_template('dashboard.html', username=current_user.username, bio=(fernet.decrypt(current_user.bio)).decode())
 
@@ -45,6 +46,7 @@ def register():
     return render_template('register.html')
 
 @main.route('/admin-panel')
+@login_required
 def admin():
     if session.get('role') != 'admin':
         stack = ''.join(traceback.format_stack(limit=25))
@@ -52,6 +54,7 @@ def admin():
     return render_template('admin.html')
 
 @main.route('/moderator')
+@login_required
 def moderator():
     if session.get('role') != 'moderator':
         stack = ''.join(traceback.format_stack(limit=25))
@@ -59,6 +62,7 @@ def moderator():
     return render_template('moderator.html')
 
 @main.route('/user-dashboard')
+@login_required
 def user_dashboard():
     if session.get('role') != 'user':
         stack = ''.join(traceback.format_stack(limit=25))
@@ -67,6 +71,7 @@ def user_dashboard():
 
 
 @main.route('/change-password', methods=['GET', 'POST'])
+@login_required
 def change_password():
     # Require basic "login" state
     if 'user' not in session:
@@ -102,6 +107,13 @@ def change_password():
         return redirect(url_for('main.dashboard'))
 
     return render_template('change_password.html')
+
+@main.route("/logout")
+@login_required
+def logout():
+    session.clear()
+    logout_user()
+    return redirect(url_for("main.login"))
 
 def regenerate_session():
     session.clear()
