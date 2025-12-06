@@ -2,8 +2,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError, Email
 import re
+from bleach import clean
 
 common_passwords = {"Password123$", "Qwerty123!", "Adminadmin1@", "weLcome123!", "CustomPassword1234!", "loGinPasssWORD13213$"}
+safe_tags = {"b", "i", "u", "em", "strong", 'a', 'p', 'ul', 'ol', 'li', 'br'}
+safe_attributes = {"a":["href", "title"]}
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Email()])
@@ -32,3 +35,10 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Password must contain a number")
         if not re.search(r"[!@#$%^&*()_+={}|:;',.?/~]", password):
             raise ValidationError("Password must contain a special character")
+
+    def validate_bio(self, bio):
+        bio_content = bio.data
+        sanitized_content = clean(bio_content, tags=safe_tags, attributes=safe_attributes, strip=True)
+        if bio_content != sanitized_content:
+            raise ValidationError("Bio contained restricted tags")
+
