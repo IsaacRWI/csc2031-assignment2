@@ -1,7 +1,7 @@
 import traceback
 from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort
 from sqlalchemy import text
-from app import db, login_manager
+from app import db, login_manager, fernet
 from app.models import User
 from app.forms import LoginForm
 from flask_login import login_user, current_user, logout_user, login_required
@@ -21,7 +21,7 @@ def login():
         if user.check_password(form.password.data):
             regenerate_session()
             login_user(user)
-            print("successful login")
+            # print("successful login")
             return redirect(url_for('main.dashboard'))
         else:
             flash("Login credentials are invalid, please try again")
@@ -30,7 +30,7 @@ def login():
 
 @main.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', username=current_user.username, bio=current_user.bio)
+    return render_template('dashboard.html', username=current_user.username, bio=(fernet.decrypt(current_user.bio)).decode())
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
