@@ -39,7 +39,7 @@ def register():
     if form.validate_on_submit():
         user = User(username=form.username.data, password="placeholder", role="user",bio=fernet.encrypt(form.bio.data.encode()))
         user.hash_password(form.password.data)
-        user.get_string()
+        # user.get_string()
         db.session.add(user)
         db.session.commit()
         return redirect(url_for("main.login"))
