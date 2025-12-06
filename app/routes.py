@@ -3,7 +3,7 @@ from flask import request, render_template, redirect, url_for, session, Blueprin
 from sqlalchemy import text
 from app import db, login_manager, fernet
 from app.models import User
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from flask_login import login_user, current_user, logout_user, login_required
 from uuid import uuid4
 
@@ -78,40 +78,19 @@ def user_dashboard():
 @main.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
-    # Require basic "login" state
-    if 'user' not in session:
-        stack = ''.join(traceback.format_stack(limit=25))
-        abort(403, description=f"Access denied.\n\n--- STACK (demo) ---\n{stack}")
-
-    username = session['user']
-
-    if request.method == 'POST':
-        current_password = request.form.get('current_password', '')
-        new_password = request.form.get('new_password', '')
-
-        user = db.session.execute(
-            text(f"SELECT * FROM user WHERE username = '{username}' AND password = '{current_password}' LIMIT 1")
-        ).mappings().first()
-
-        # Enforce: current password must be valid for user
-        if not user:
-            flash('Current password is incorrect', 'error')
-            return render_template('change_password.html')
-
-        # Enforce: new password must be different from current password
-        if new_password == current_password:
-            flash('New password must be different from the current password', 'error')
-            return render_template('change_password.html')
-
-        db.session.execute(
-            text(f"UPDATE user SET password = '{new_password}' WHERE username = '{username}'")
-        )
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=current_user.username.strip()).first()
+        user.hash_password(form.new_password.data)
         db.session.commit()
-
         flash('Password changed successfully', 'success')
         return redirect(url_for('main.dashboard'))
-
-    return render_template('change_password.html')
+    elif request.method == "POST":
+        flash("Validation Failed")
+        for field, errors in form.errors.items():
+            for i in errors:
+                flash(f"{field} - {i}", category="warning")
+    return render_template('change_password.html', form=form)
 
 @main.route("/logout")
 @login_required

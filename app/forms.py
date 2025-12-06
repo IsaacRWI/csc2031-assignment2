@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired, EqualTo, Length, ValidationError, E
 import re
 from bleach import clean
 from app.models import User
+from flask_login import current_user
 
 common_passwords = {"Password123$", "Qwerty123!", "Adminadmin1@", "weLcome123!", "CustomPassword1234!", "loGinPasssWORD13213$"}
 safe_tags = {"b", "i", "u", "em", "strong", 'a', 'p', 'ul', 'ol', 'li', 'br'}
@@ -49,3 +50,31 @@ class RegisterForm(FlaskForm):
         if bio_content != sanitized_content:
             raise ValidationError("Bio contained restricted tags")
 
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField("Current Password", validators=[DataRequired()])
+    new_password = PasswordField("New Password", validators=[DataRequired()])
+    confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("new_password", message="Must match new password")])
+    submit = SubmitField("Change Password")
+
+    def validate_current_password(self, current_password):
+        password = current_password.data
+        if not current_user.check_password(password):
+            raise ValidationError("Current password is incorrect")
+
+    def validate_new_password(self, new_password):  # apparently WTForm calls the validators by name so this wasnt getting called at all
+        password = new_password.data
+        username = current_user.username.lower()
+        if current_user.check_password(password):
+            raise ValidationError("New password cannot be the same as old password")
+        if password in common_passwords:
+            raise ValidationError("Password cannot be in blacklist")
+        if username in password:
+            raise ValidationError("Password cannot contain your username")
+        if len(password) < 10:
+            raise ValidationError("Password cannot be shorter than 10 characters")
+        if not re.search(r"[A-Z]", password):
+            raise ValidationError("Password must contain a capital letter")
+        if not re.search(r"\d", password):
+            raise ValidationError("Password must contain a number")
+        if not re.search(r"[!@#$%^&*()_+={}|:;',.?/~]", password):
+            raise ValidationError("Password must contain a special character")
