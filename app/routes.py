@@ -17,7 +17,7 @@ def home():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first() if form.username.data else None
+        user = User.query.filter_by(username=form.username.data.strip()).first() if form.username.data else None
         if user.check_password(form.password.data):
             regenerate_session()
             login_user(user)
