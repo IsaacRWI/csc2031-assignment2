@@ -8,3 +8,4 @@ bleach
 bcrypt
 flask-bcrypt
 cryptography
+email-validator
