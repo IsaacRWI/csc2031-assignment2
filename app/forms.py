@@ -15,7 +15,7 @@ class LoginForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=10)])
+    password = PasswordField("Password", validators=[DataRequired()])
     confirm_password = PasswordField("Confirm password", validators=[DataRequired(), EqualTo("password", message="Must match original password")])
     bio = TextAreaField("Enter something about yourself")
     submit = SubmitField("Register")

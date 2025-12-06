@@ -43,6 +43,11 @@ def register():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for("main.login"))
+    elif request.method == "POST":
+        flash("Validation Failed")
+        for field, errors in form.errors.items():
+            for i in errors:
+                flash(f"{field} - {i}", category="warning")
     return render_template("register.html", form=form)
 
 @main.route('/admin-panel')
