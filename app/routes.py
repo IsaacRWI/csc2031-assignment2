@@ -3,7 +3,7 @@ from flask import request, render_template, redirect, url_for, session, Blueprin
 from sqlalchemy import text
 from app import db, login_manager, fernet
 from app.models import User
-from app.forms import LoginForm
+from app.forms import LoginForm, RegisterForm
 from flask_login import login_user, current_user, logout_user, login_required
 from uuid import uuid4
 
@@ -35,15 +35,15 @@ def dashboard():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        bio = request.form['bio']
-        role = request.form.get('role', 'user')
-        db.session.execute(text(f"INSERT INTO user (username, password, role, bio) VALUES ('{username}', '{password}', '{role}', '{bio}')"))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, password="placeholder", role="user",bio=fernet.encrypt(form.bio.encode()))
+        user.hash_password(form.password.data)
+        user.get_string()
+        db.session.add(user)
         db.session.commit()
-        return redirect(url_for('main.login'))
-    return render_template('register.html')
+        return redirect(url_for("main.login"))
+    return render_template("register.html", form=form)
 
 @main.route('/admin-panel')
 @login_required
