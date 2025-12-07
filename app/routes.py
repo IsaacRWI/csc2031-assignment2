@@ -4,8 +4,8 @@ from sqlalchemy import text
 from app import db, login_manager, fernet
 from app.models import User
 from app.forms import LoginForm, RegisterForm, ChangePasswordForm
-from flask_login import login_user, current_user, logout_user, login_required
 from uuid import uuid4
+from flask_security import roles_required, roles_accepted, login_required, login_user, current_user, logout_user
 
 main = Blueprint('main', __name__)
 
@@ -22,6 +22,7 @@ def login():
             regenerate_session()
             login_user(user)
             # print("successful login")
+            # print("Is authenticated:", current_user.is_authenticated)
             return redirect(url_for('main.dashboard'))
         else:
             flash("Login credentials are invalid, please try again")
@@ -29,8 +30,10 @@ def login():
 
 
 @main.route('/dashboard')
+@roles_accepted("user", "admin", "moderator")
 @login_required
 def dashboard():
+    # print([role.name for role in current_user.roles])
     return render_template('dashboard.html', username=current_user.username, bio=(fernet.decrypt(current_user.bio)).decode())
 
 @main.route('/register', methods=['GET', 'POST'])

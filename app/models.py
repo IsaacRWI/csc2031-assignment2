@@ -1,6 +1,5 @@
 from app import db, bcrypt, user_datastore
-from flask_login import UserMixin
-from flask_security import RoleMixin
+from flask_security import UserMixin, RoleMixin
 import uuid
 
 roles_users = db.Table('roles_users',
@@ -20,7 +19,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean(), default=True)  # required for flask security too or it gets mad
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False, default=lambda: uuid.uuid4().hex)
-    role = db.relationship("Role", secondary=roles_users, backref="roled", lazy="dynamic")
+    roles = db.relationship("Role", secondary=roles_users, backref="roled")
     bio = db.Column(db.String(500), nullable=False)
 
     def hash_password(self, text_password):
