@@ -9,3 +9,4 @@ bcrypt
 flask-bcrypt
 cryptography
 email-validator
+flask-security-too

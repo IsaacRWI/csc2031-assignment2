@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_security import SQLAlchemyUserDatastore, Security
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_wtf import CSRFProtect
@@ -19,6 +20,8 @@ csrf = CSRFProtect()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 
+user_datastore = None
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -35,10 +38,18 @@ def create_app():
     app.register_blueprint(main)
 
     with app.app_context():
-        from .models import User
+        from .models import User, Role, roles_users
+        user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+        Security(app, user_datastore)
+
         db.drop_all()
         db.create_all()
         # counter = 0
+
+        for i in ["user", "moderator", "admin"]:
+            user_datastore.find_or_create_role(name=i)
+            db.session.commit()
+
 
         users = [
             {"username": "user1@email.com", "password": "Userpass!23", "role": "user", "bio": "I'm a basic user"},
@@ -47,8 +58,9 @@ def create_app():
         ]
 
         for i in users:
-            user = User(username=i["username"], password="placeholder", role=i["role"], bio=fernet.encrypt((i["bio"]).encode()))
+            user = user_datastore.create_user(username=i["username"], password="placeholder", bio=fernet.encrypt((i["bio"]).encode()))
             user.hash_password(i["password"])
+            user_datastore.add_role_to_user(user, user_datastore.find_role(i["role"]))
             # user.get_string()
             db.session.add(user)
             db.session.commit()
