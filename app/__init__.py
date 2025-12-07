@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_security import SQLAlchemyUserDatastore, Security
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
@@ -66,5 +66,9 @@ def create_app():
             db.session.commit()
             # counter += 1
     # print(counter)
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return render_template("403_forbidden.html"), 403
     return app
 
