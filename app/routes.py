@@ -30,8 +30,8 @@ def login():
 
 
 @main.route('/dashboard')
-@roles_accepted("user", "admin", "moderator")
 @login_required
+@roles_accepted("user", "admin", "moderator")
 def dashboard():
     # print([role.name for role in current_user.roles])
     return render_template('dashboard.html', username=current_user.username, bio=(fernet.decrypt(current_user.bio)).decode())
@@ -55,14 +55,13 @@ def register():
 
 @main.route('/admin-panel')
 @login_required
+@roles_required("admin")
 def admin():
-    if session.get('role') != 'admin':
-        stack = ''.join(traceback.format_stack(limit=25))
-        abort(403, description=f"Access denied.\n\n--- STACK (demo) ---\n{stack}")
     return render_template('admin.html')
 
 @main.route('/moderator')
 @login_required
+@roles_required("moderator")
 def moderator():
     if session.get('role') != 'moderator':
         stack = ''.join(traceback.format_stack(limit=25))
@@ -71,11 +70,9 @@ def moderator():
 
 @main.route('/user-dashboard')
 @login_required
+@roles_required("user")
 def user_dashboard():
-    if session.get('role') != 'user':
-        stack = ''.join(traceback.format_stack(limit=25))
-        abort(403, description=f"Access denied.\n\n--- STACK (demo) ---\n{stack}")
-    return render_template('user_dashboard.html', username=session.get('user'))
+    return render_template('user_dashboard.html', username=current_user.username)
 
 
 @main.route('/change-password', methods=['GET', 'POST'])
@@ -87,7 +84,8 @@ def change_password():
         user.hash_password(form.new_password.data)
         db.session.commit()
         flash('Password changed successfully', 'success')
-        return redirect(url_for('main.dashboard'))
+        logout_user()
+        return redirect(url_for('main.login'))
     elif request.method == "POST":
         flash("Validation Failed")
         for field, errors in form.errors.items():
