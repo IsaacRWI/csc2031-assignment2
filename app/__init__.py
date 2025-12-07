@@ -20,7 +20,7 @@ csrf = CSRFProtect()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
 
-user_datastore = None
+user_datastore = SQLAlchemyUserDatastore(db, None, None)
 
 def create_app():
     app = Flask(__name__)
@@ -39,7 +39,8 @@ def create_app():
 
     with app.app_context():
         from .models import User, Role, roles_users
-        user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+        user_datastore.user_model = User
+        user_datastore.role_model = Role
         Security(app, user_datastore)
 
         db.drop_all()

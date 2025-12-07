@@ -1,7 +1,7 @@
 import traceback
 from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort
 from sqlalchemy import text
-from app import db, login_manager, fernet
+from app import db, login_manager, fernet, user_datastore
 from app.models import User
 from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from uuid import uuid4
@@ -40,11 +40,13 @@ def dashboard():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, password="placeholder", role="user",bio=fernet.encrypt(form.bio.data.encode()))
+        user = user_datastore.create_user(username=form.username.data, password="placeholder", bio=fernet.encrypt((form.bio.data.encode())))
         user.hash_password(form.password.data)
+        user_datastore.add_role_to_user(user, user_datastore.find_role("user"))
         # user.get_string()
         db.session.add(user)
         db.session.commit()
+        flash("Registration Successful")
         return redirect(url_for("main.login"))
     elif request.method == "POST":
         flash("Validation Failed")
