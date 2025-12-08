@@ -6,9 +6,9 @@ from bleach import clean
 from app.models import User
 from flask_login import current_user
 
-common_passwords = {"Password123$", "Qwerty123!", "Adminadmin1@", "weLcome123!", "CustomPassword1234!", "loGinPasssWORD13213$"}
-safe_tags = {"b", "i", "u", "em", "strong", 'a', 'p', 'ul', 'ol', 'li', 'br'}
-safe_attributes = {"a":["href", "title"]}
+common_passwords = {"Password123$", "Qwerty123!", "Adminadmin1@", "weLcome123!", "CustomPassword1234!", "loGinPasssWORD13213$"}  # blacklisted passwords
+safe_tags = {"b", "i", "u", "em", "strong", 'a', 'p', 'ul', 'ol', 'li', 'br'}  # safe tags for the bio
+safe_attributes = {"a":["href", "title"]}  # safe attributes
 
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Email(), Length(max=320)])  # apparently the max length for an email address is 320, 64 before the @ and 255 after
@@ -23,12 +23,14 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
     def validate_username(self, username):
+        """validates username to make sure account to be registered is not already in the database"""
         username = username.data
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             raise ValidationError("Username already exists in database")
 
     def validate_password(self, password):
+        """validate password in accordance to assignment specifications"""
         password = password.data
         username = self.username.data.lower()
         if password in common_passwords:
@@ -47,6 +49,7 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Password cannot contain repeated character sequences")
 
     def validate_bio(self, bio):
+        """validates the bio"""
         bio_content = bio.data
         sanitized_content = clean(bio_content, tags=safe_tags, attributes=safe_attributes, strip=True)
         if bio_content != sanitized_content:
@@ -59,11 +62,13 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField("Change Password")
 
     def validate_current_password(self, current_password):
+        """making sure the current password is correct"""
         password = current_password.data
         if not current_user.check_password(password):
             raise ValidationError("Current password is incorrect")
 
     def validate_new_password(self, new_password):  # apparently WTForm calls the validators by name so this wasnt getting called at all
+        """makes sure new password is longer than 10 characters and other things and makes sure new password is not the same as old password"""
         password = new_password.data
         username = current_user.username.lower()
         if current_user.check_password(password):
