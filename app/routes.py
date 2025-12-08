@@ -1,5 +1,5 @@
 import traceback
-from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort
+from flask import request, render_template, redirect, url_for, session, Blueprint, flash, abort, current_app
 from sqlalchemy import text
 from app import db, login_manager, fernet, user_datastore
 from app.models import User
@@ -119,13 +119,13 @@ def regenerate_session():
     session["csrf_token"] = uuid4().hex
 
 def log_event(level, message, username=None):
-    ip = request.remote_addr
+    ip = request.remote_addr or "N/A"
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_message = f"{timestamp} Client IP: {ip}, User: {username or "N/A"} | {message}"
     if level == "info":
-        logging.info(log_message)
+        current_app.logger.info(log_message)
     elif level == "warning":
-        logging.warning(log_message)
+        current_app.logger.warning(log_message)
 
 @login_manager.user_loader
 def load_user(user_id):

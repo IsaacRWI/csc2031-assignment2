@@ -8,6 +8,8 @@ from flask_login import LoginManager
 from cryptography.fernet import Fernet
 import os
 from dotenv import load_dotenv
+import logging
+from logging.handlers import RotatingFileHandler
 
 # initializing Fernet to encrypt bio
 load_dotenv()
@@ -21,6 +23,34 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 
 user_datastore = SQLAlchemyUserDatastore(db, None, None)
+
+def configure_logging(app):
+    os.makedirs("logs", exist_ok=True)
+
+    for i in app.logger.handlers[:]:
+        app.logger.removeHandler(i)
+
+    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s: %(message)s","%Y-%m-%d %H:%M:%S")
+    app.logger.setLevel(logging.DEBUG)
+
+
+    if app.debug or app.config.get("ENV") == "development":
+        log_file = "logs/debug.log"
+        file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=3)
+        file_handler.setLevel(logging.DEBUG)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+    else:
+        log_file = "logs/production.log"
+        file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=3)
+        file_handler.setLevel(logging.INFO)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+    app.logger.addHandler(file_handler)
+    app.logger.addHandler(console_handler)
+
 
 def create_app():
     app = Flask(__name__)
