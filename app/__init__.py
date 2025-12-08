@@ -60,9 +60,13 @@ def configure_logging(app):
     app.logger.addHandler(console_handler)
 
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
-    app.config.from_object(Config)  # for switching between debug or production mode
+    if config:
+        app.config.from_object(config)  # for switching between debug or production mode
+    else:
+        from config import DevelopmentConfig
+        app.config.from_object(DevelopmentConfig)
 
     configure_logging(app)  # telling flask to use the logging thing above instead of the flask default logging
 
