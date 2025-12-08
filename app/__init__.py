@@ -30,6 +30,13 @@ def configure_logging(app):
 
     for i in app.logger.handlers[:]:
         app.logger.removeHandler(i)
+    werk = logging.getLogger("werkzeug")
+    for i in werk.handlers[:]:
+        werk.removeHandler(i)
+    root = logging.getLogger()
+    for i in root.handlers:
+        root.removeHandler(i)
+    werk.propagate = False  # i had to ask ai on how to get this part working  apparently windows os had file conflict because multiple loggers were accessing the log file at the same time and the logger couldnt change the log file name so thats fixed now
 
     formatter = logging.Formatter("%(message)s")
     app.logger.setLevel(logging.DEBUG)
@@ -37,7 +44,7 @@ def configure_logging(app):
 
     if app.debug or app.config.get("ENV") == "development":
         log_file = "logs/debug.log"
-        file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=3)
+        file_handler = RotatingFileHandler(log_file, maxBytes=1024, backupCount=5, delay=True)
         file_handler.setLevel(logging.DEBUG)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
