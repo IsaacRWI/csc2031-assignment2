@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-from flask_security import SQLAlchemyUserDatastore, Security
+from flask import Flask, render_template, request
+from flask_security import SQLAlchemyUserDatastore, Security, current_user
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_wtf import CSRFProtect
@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from logging.handlers import RotatingFileHandler
+from app.logger import log_event
 
 # initializing Fernet to encrypt bio
 load_dotenv()
@@ -102,18 +103,22 @@ def create_app():
 
     @app.errorhandler(403)
     def forbidden(e):
+        log_event("warning", f"Error 403 attempted access without proper permission | {request.url}", current_user.username)
         return render_template("403_forbidden.html"), 403
 
     @app.errorhandler(400)
     def bad_request(e):
+        log_event("error", f"Error 400 bad request | {request.url}", current_user.username)
         return render_template("400_bad_request.html"), 400
 
     @app.errorhandler(404)
     def not_found(e):
+        log_event("error", f"Error 404 page not found | {request.url}", current_user.username)
         return render_template("404_not_found.html"), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
+        log_event("error", f"Error 500 internal server error | {request.url}", current_user.username)
         return render_template("500_internal_server_error.html"), 500
     return app
 

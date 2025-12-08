@@ -1,1 +1,53 @@
-2025-12-08 18:33:27 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:45:32 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:45:32 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[info] 2025-12-08 20:46:12 Client IP: 127.0.0.1, User: user1@email.com | User logout
+[warning] 2025-12-08 20:46:14 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, incorrect password
+[warning] 2025-12-08 20:46:23 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, validation error
+[info] 2025-12-08 20:46:32 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:46:32 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 20:46:39 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error
+[info] 2025-12-08 20:46:58 Client IP: 127.0.0.1, User: user1@email.com | Password changed successfully
+[info] 2025-12-08 20:47:03 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:47:03 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[info] 2025-12-08 20:47:10 Client IP: 127.0.0.1, User: user1@email.com | User dashboard accessed
+[info] 2025-12-08 20:47:21 Client IP: 127.0.0.1, User: hello123@gmail.com | New user registered
+[warning] 2025-12-08 20:47:29 Client IP: 127.0.0.1, User: hello123@gmail.com | User registration failed, validation error
+[info] 2025-12-08 20:50:24 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:50:24 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 20:50:29 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['current_password - Current password is incorrect', 'new_password - Password cannot be shorter than 10 characters', 'confirm_password - Must match new password']
+[warning] 2025-12-08 20:52:23 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, validation error | ['password - This field is required.']
+[warning] 2025-12-08 20:52:43 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, incorrect password
+[warning] 2025-12-08 20:52:47 Client IP: 127.0.0.1, User: N/A | Failed login attempted, validation error | ['username - This field is required.', 'password - This field is required.']
+[info] 2025-12-08 20:52:55 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 20:52:55 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 20:53:02 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['current_password - This field is required.', 'new_password - This field is required.', 'confirm_password - This field is required.']
+[warning] 2025-12-08 20:53:17 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['current_password - Current password is incorrect', 'new_password - New password cannot be the same as old password']
+[warning] 2025-12-08 20:53:34 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['new_password - Password cannot be in blacklist']
+[warning] 2025-12-08 21:03:14 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, incorrect password
+[warning] 2025-12-08 21:03:25 Client IP: 127.0.0.1, User: user1@email.com | Failed login attempted, validation error | ['password - This field is required.']
+[warning] 2025-12-08 21:03:29 Client IP: 127.0.0.1, User: N/A | Failed login attempted, validation error | ['username - This field is required.', 'password - This field is required.']
+[info] 2025-12-08 21:03:37 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 21:03:37 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[info] 2025-12-08 21:03:40 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[info] 2025-12-08 21:03:43 Client IP: 127.0.0.1, User: user1@email.com | User dashboard accessed
+[warning] 2025-12-08 21:03:45 Client IP: 127.0.0.1, User: user1@email.com | Error 403 Forbidden access | http://127.0.0.1:5000/user-dashboard
+[warning] 2025-12-08 21:03:59 Client IP: 127.0.0.1, User: user1@email.com | Error 403 Forbidden access | http://127.0.0.1:5000/moderator
+[info] 2025-12-08 21:05:05 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 21:05:05 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 21:05:08 Client IP: 127.0.0.1, User: user1@email.com | Error 403 Forbidden access | http://127.0.0.1:5000/admin-panel
+[info] 2025-12-08 21:05:30 Client IP: 127.0.0.1, User: user1@email.com | User dashboard accessed
+[warning] 2025-12-08 21:05:44 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['new_password - This field is required.', 'confirm_password - This field is required.']
+[warning] 2025-12-08 21:05:56 Client IP: 127.0.0.1, User: user1@email.com | Failed password change attempt, validation error | ['current_password - Current password is incorrect']
+[info] 2025-12-08 21:06:06 Client IP: 127.0.0.1, User: user1@email.com | Password changed successfully
+[info] 2025-12-08 21:06:12 Client IP: 127.0.0.1, User: user1@email.com | Successful login
+[info] 2025-12-08 21:06:12 Client IP: 127.0.0.1, User: user1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 21:06:20 Client IP: 127.0.0.1, User: user1@email.com | Error 403 Forbidden access | http://127.0.0.1:5000/moderator
+[warning] 2025-12-08 21:06:20 Client IP: 127.0.0.1, User: user1@email.com | Error 403 Forbidden access | http://127.0.0.1:5000/admin-panel
+[info] 2025-12-08 21:11:25 Client IP: 127.0.0.1, User: mod1@email.com | Successful login
+[info] 2025-12-08 21:11:25 Client IP: 127.0.0.1, User: mod1@email.com | Shared dashboard accessed
+[info] 2025-12-08 21:11:26 Client IP: 127.0.0.1, User: mod1@email.com | Shared dashboard accessed
+[warning] 2025-12-08 21:11:29 Client IP: 127.0.0.1, User: mod1@email.com | Error 403 attempted access without proper permission | http://127.0.0.1:5000/user-dashboard
+[info] 2025-12-08 21:11:30 Client IP: 127.0.0.1, User: mod1@email.com | Moderator dashboard accessed
+[error] 2025-12-08 21:11:51 Client IP: 127.0.0.1, User: mod1@email.com | Error 404 page not found | http://127.0.0.1:5000/moderatordsad
+[error] 2025-12-08 21:12:02 Client IP: 127.0.0.1, User: mod1@email.com | Error 400 bad request | http://127.0.0.1:5000/force400
+[error] 2025-12-08 21:12:08 Client IP: 127.0.0.1, User: mod1@email.com | Error 500 internal server error | http://127.0.0.1:5000/force500

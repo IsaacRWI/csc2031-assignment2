@@ -6,8 +6,7 @@ from app.models import User
 from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from uuid import uuid4
 from flask_security import roles_required, roles_accepted, login_required, login_user, current_user, logout_user
-import logging
-from datetime import datetime
+from app.logger import log_event
 
 main = Blueprint('main', __name__)
 
@@ -31,11 +30,14 @@ def login():
             log_event("warning", "Failed login attempted, incorrect password", user.username)
             flash("Login credentials are invalid, please try again")
     elif request.method == "POST":
+        lst = []
         flash("Validation Failed")
         for field, errors in form.errors.items():
             for i in errors:
-                flash(f"{field} - {i}", category="warning")
-        log_event("warning", "Failed login attempted, validation error", form.username.data)
+                val_error = f"{field} - {i}"
+                flash(val_error, category="warning")
+                lst.append(val_error)
+        log_event("warning", f"Failed login attempted, validation error | {lst}", form.username.data)
     return render_template('login.html', form=form)
 
 
@@ -62,10 +64,13 @@ def register():
         return redirect(url_for("main.login"))
     elif request.method == "POST":
         flash("Validation Failed")
+        lst = []
         for field, errors in form.errors.items():
             for i in errors:
-                flash(f"{field} - {i}", category="warning")
-        log_event("warning", "User registration failed, validation error", form.username.data)
+                val_error = f"{field} - {i}"
+                flash(val_error, category="warning")
+                lst.append(val_error)
+        log_event("warning", f"User registration failed, validation error | {lst}", form.username.data)
     return render_template("register.html", form=form)
 
 @main.route('/admin-panel')
@@ -100,20 +105,24 @@ def change_password():
         db.session.commit()
         flash('Password changed successfully', 'success')
         log_event("info", "Password changed successfully", current_user.username)
+        log_event("info", "Logged out user", current_user.username)
         logout_user()
         return redirect(url_for('main.login'))
     elif request.method == "POST":
+        lst = []
         flash("Validation Failed")
         for field, errors in form.errors.items():
             for i in errors:
-                flash(f"{field} - {i}", category="warning")
-        log_event("warning", "Failed password change attempt, validation error", current_user.username)
+                val_error = f"{field} - {i}"
+                flash(val_error, category="warning")
+                lst.append(val_error)
+        log_event("warning", f"Failed password change attempt, validation error | {lst}", current_user.username)
     return render_template('change_password.html', form=form)
 
 @main.route("/logout")
 @login_required
 def logout():
-    log_event("info", "User logout", current_user.username)
+    log_event("info", "Logged out user", current_user.username)
     session.clear()
     logout_user()
     return redirect(url_for("main.login"))
@@ -129,15 +138,6 @@ def force500():
 def regenerate_session():
     session.clear()
     session["csrf_token"] = uuid4().hex
-
-def log_event(level, message, username=None):
-    ip = request.remote_addr or "N/A"
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_message = f"[{level}] {timestamp} Client IP: {ip}, User: {username or "N/A"} | {message}"
-    if level == "info":
-        current_app.logger.info(log_message)
-    elif level == "warning":
-        current_app.logger.warning(log_message)
 
 @login_manager.user_loader
 def load_user(user_id):
