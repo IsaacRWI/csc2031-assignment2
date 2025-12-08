@@ -23,7 +23,8 @@ def login():
         if user.check_password(form.password.data):
             regenerate_session()
             login_user(user)
-            # print("successful login")
+            log_event("info", "Successful login", current_user.username)
+            print("successful login")
             # print("Is authenticated:", current_user.is_authenticated)
             return redirect(url_for('main.dashboard'))
         else:

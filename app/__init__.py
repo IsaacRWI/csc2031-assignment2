@@ -30,7 +30,7 @@ def configure_logging(app):
     for i in app.logger.handlers[:]:
         app.logger.removeHandler(i)
 
-    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s: %(message)s","%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter("%(message)s")
     app.logger.setLevel(logging.DEBUG)
 
 
@@ -55,6 +55,8 @@ def configure_logging(app):
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    configure_logging(app)
 
     db.init_app(app)
     csrf.init_app(app)
