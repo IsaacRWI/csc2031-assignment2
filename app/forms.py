@@ -43,6 +43,8 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Password must contain a number")
         if not re.search(r"[!@#$%^&*()_+={}|:;',.?/~]", password):
             raise ValidationError("Password must contain a special character")
+        if re.search(r'(.)\1\1', password):
+            raise ValidationError("Password cannot contain repeated character sequences")
 
     def validate_bio(self, bio):
         bio_content = bio.data
@@ -78,3 +80,5 @@ class ChangePasswordForm(FlaskForm):
             raise ValidationError("Password must contain a number")
         if not re.search(r"[!@#$%^&*()_+={}|:;',.?/~]", password):
             raise ValidationError("Password must contain a special character")
+        if re.search(r'(.)\1\1', password):
+            raise ValidationError("Password cannot contain repeated character sequences")
