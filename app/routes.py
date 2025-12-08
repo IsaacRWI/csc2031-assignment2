@@ -24,16 +24,18 @@ def login():
             regenerate_session()
             login_user(user)
             log_event("info", "Successful login", current_user.username)
-            print("successful login")
+            # print("successful login")
             # print("Is authenticated:", current_user.is_authenticated)
             return redirect(url_for('main.dashboard'))
         else:
+            log_event("warning", "Failed login attempted, incorrect password", user.username)
             flash("Login credentials are invalid, please try again")
     elif request.method == "POST":
         flash("Validation Failed")
         for field, errors in form.errors.items():
             for i in errors:
                 flash(f"{field} - {i}", category="warning")
+        log_event("warning", "Failed login attempted, validation error", form.username.data)
     return render_template('login.html', form=form)
 
 
@@ -42,6 +44,7 @@ def login():
 @roles_accepted("user", "admin", "moderator")
 def dashboard():
     # print([role.name for role in current_user.roles])
+    log_event("info", "Shared dashboard accessed", current_user.username)
     return render_template('dashboard.html', username=current_user.username, bio=(fernet.decrypt(current_user.bio)).decode())
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -55,30 +58,35 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash("Registration Successful")
+        log_event("info", "New user registered", user.username)
         return redirect(url_for("main.login"))
     elif request.method == "POST":
         flash("Validation Failed")
         for field, errors in form.errors.items():
             for i in errors:
                 flash(f"{field} - {i}", category="warning")
+        log_event("warning", "User registration failed, validation error", form.username.data)
     return render_template("register.html", form=form)
 
 @main.route('/admin-panel')
 @login_required
 @roles_required("admin")
 def admin():
+    log_event("info", "Admin dashboard accessed", current_user.username)
     return render_template('admin.html')
 
 @main.route('/moderator')
 @login_required
 @roles_required("moderator")
 def moderator():
+    log_event("info", "Moderator dashboard accessed", current_user.username)
     return render_template('moderator.html')
 
 @main.route('/user-dashboard')
 @login_required
 @roles_required("user")
 def user_dashboard():
+    log_event("info", "User dashboard accessed", current_user.username)
     return render_template('user_dashboard.html', username=current_user.username)
 
 
@@ -91,6 +99,7 @@ def change_password():
         user.hash_password(form.new_password.data)
         db.session.commit()
         flash('Password changed successfully', 'success')
+        log_event("info", "Password changed successfully", current_user.username)
         logout_user()
         return redirect(url_for('main.login'))
     elif request.method == "POST":
@@ -98,11 +107,13 @@ def change_password():
         for field, errors in form.errors.items():
             for i in errors:
                 flash(f"{field} - {i}", category="warning")
+        log_event("warning", "Failed password change attempt, validation error", current_user.username)
     return render_template('change_password.html', form=form)
 
 @main.route("/logout")
 @login_required
 def logout():
+    log_event("info", "User logout", current_user.username)
     session.clear()
     logout_user()
     return redirect(url_for("main.login"))
@@ -122,7 +133,7 @@ def regenerate_session():
 def log_event(level, message, username=None):
     ip = request.remote_addr or "N/A"
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_message = f"{timestamp} Client IP: {ip}, User: {username or "N/A"} | {message}"
+    log_message = f"[{level}] {timestamp} Client IP: {ip}, User: {username or "N/A"} | {message}"
     if level == "info":
         current_app.logger.info(log_message)
     elif level == "warning":
