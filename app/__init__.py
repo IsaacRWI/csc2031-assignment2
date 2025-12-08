@@ -71,5 +71,17 @@ def create_app():
     @app.errorhandler(403)
     def forbidden(e):
         return render_template("403_forbidden.html"), 403
+
+    @app.errorhandler(400)
+    def bad_request(e):
+        return render_template("400_bad_request.html"), 400
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return render_template("404_not_found.html"), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template("500_internal_server_error.html"), 500
     return app
 

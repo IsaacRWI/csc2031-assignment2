@@ -102,6 +102,14 @@ def logout():
     logout_user()
     return redirect(url_for("main.login"))
 
+@main.route("/force400")
+def force400():
+    abort(400)
+
+@main.route("/force500")
+def force500():
+    abort(500)
+
 def regenerate_session():
     session.clear()
     session["csrf_token"] = uuid4().hex
