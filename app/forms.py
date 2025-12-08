@@ -11,13 +11,13 @@ safe_tags = {"b", "i", "u", "em", "strong", 'a', 'p', 'ul', 'ol', 'li', 'br'}
 safe_attributes = {"a":["href", "title"]}
 
 class LoginForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired()])
+    username = StringField("Username", validators=[DataRequired(), Email(), Length(max=320)])  # apparently the max length for an email address is 320, 64 before the @ and 255 after
+    password = PasswordField("Password", validators=[DataRequired(), Length(max=640)])
     submit = SubmitField("Login")
 
 class RegisterForm(FlaskForm):
-    username = StringField("Username", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired()])
+    username = StringField("Username", validators=[DataRequired(), Email(), Length(min=6, max=320)])
+    password = PasswordField("Password", validators=[DataRequired(), Length(max=640)])
     confirm_password = PasswordField("Confirm password", validators=[DataRequired(), EqualTo("password", message="Must match original password")])
     bio = TextAreaField("Enter something about yourself")
     submit = SubmitField("Register")
@@ -51,8 +51,8 @@ class RegisterForm(FlaskForm):
             raise ValidationError("Bio contained restricted tags")
 
 class ChangePasswordForm(FlaskForm):
-    current_password = PasswordField("Current Password", validators=[DataRequired()])
-    new_password = PasswordField("New Password", validators=[DataRequired()])
+    current_password = PasswordField("Current Password", validators=[DataRequired(), Length(max=640)])
+    new_password = PasswordField("New Password", validators=[DataRequired(), Length(max=640)])
     confirm_password = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("new_password", message="Must match new password")])
     submit = SubmitField("Change Password")
 
