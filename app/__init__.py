@@ -44,13 +44,13 @@ def configure_logging(app):
 
     if app.debug or app.config.get("ENV") == "development":
         log_file = "logs/debug.log"
-        file_handler = RotatingFileHandler(log_file, maxBytes=1024, backupCount=5, delay=True)
+        file_handler = RotatingFileHandler(log_file, maxBytes=1000000, backupCount=5, delay=True)
         file_handler.setLevel(logging.DEBUG)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
     else:
         log_file = "logs/production.log"
-        file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=3)
+        file_handler = RotatingFileHandler(log_file, maxBytes=1000000, backupCount=5, delay=True)
         file_handler.setLevel(logging.INFO)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
