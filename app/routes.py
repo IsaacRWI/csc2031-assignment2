@@ -70,9 +70,6 @@ def admin():
 @login_required
 @roles_required("moderator")
 def moderator():
-    if session.get('role') != 'moderator':
-        stack = ''.join(traceback.format_stack(limit=25))
-        abort(403, description=f"Access denied.\n\n--- STACK (demo) ---\n{stack}")
     return render_template('moderator.html')
 
 @main.route('/user-dashboard')
