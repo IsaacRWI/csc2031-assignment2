@@ -26,8 +26,9 @@ login_manager = LoginManager()
 user_datastore = SQLAlchemyUserDatastore(db, None, None)
 
 def configure_logging(app):
-    os.makedirs("logs", exist_ok=True)
+    os.makedirs("logs", exist_ok=True)  # making sure the logging folder exists
 
+    # removing all other loggers so there wont be file conflicts and multiple log messages per event
     for i in app.logger.handlers[:]:
         app.logger.removeHandler(i)
     werk = logging.getLogger("werkzeug")
@@ -41,10 +42,9 @@ def configure_logging(app):
     formatter = logging.Formatter("%(message)s")
     app.logger.setLevel(logging.DEBUG)
 
-
-    if app.debug or app.config.get("ENV") == "development":
+    if app.debug or app.config.get("ENV") == "development":  # if app is launched in debug mode
         log_file = "logs/debug.log"
-        file_handler = RotatingFileHandler(log_file, maxBytes=1000000, backupCount=5, delay=True)
+        file_handler = RotatingFileHandler(log_file, maxBytes=1000000, backupCount=5, delay=True)  # delay=True fixes the file conflict issue where the logger tries to rename the file whilst still reading it
         file_handler.setLevel(logging.DEBUG)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
@@ -54,7 +54,7 @@ def configure_logging(app):
         file_handler.setLevel(logging.INFO)
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)  # only logs the messages and none of the other metadata stuff before thats taken care of by the log_event method
     console_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
     app.logger.addHandler(console_handler)
@@ -62,9 +62,9 @@ def configure_logging(app):
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(Config)  # for switching between debug or production mode
 
-    configure_logging(app)
+    configure_logging(app)  # telling flask to use the logging thing above instead of the flask default logging
 
     db.init_app(app)
     csrf.init_app(app)
@@ -87,7 +87,7 @@ def create_app():
         db.create_all()
         # counter = 0
 
-        for i in ["user", "moderator", "admin"]:
+        for i in ["user", "moderator", "admin"]:  # creating role entries in the role table
             user_datastore.find_or_create_role(name=i)
             db.session.commit()
 
@@ -98,7 +98,7 @@ def create_app():
             {"username": "admin1@email.com", "password": "Adminpass!23", "role": "admin", "bio": "I'm an administrator"}
         ]
 
-        for i in users:
+        for i in users:  # creating seeded users
             user = user_datastore.create_user(username=i["username"], password="placeholder", bio=fernet.encrypt((i["bio"]).encode()))
             user.hash_password(i["password"])
             user_datastore.add_role_to_user(user, user_datastore.find_role(i["role"]))
@@ -108,6 +108,7 @@ def create_app():
             # counter += 1
     # print(counter)
 
+    # custom error handlers
     @app.errorhandler(403)
     def forbidden(e):
         log_event("warning", f"Error 403 attempted access without proper permission | {request.url}", current_user.username)
