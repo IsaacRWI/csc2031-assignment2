@@ -6,6 +6,8 @@ from app.models import User
 from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from uuid import uuid4
 from flask_security import roles_required, roles_accepted, login_required, login_user, current_user, logout_user
+import logging
+from datetime import datetime
 
 main = Blueprint('main', __name__)
 
@@ -115,6 +117,15 @@ def force500():
 def regenerate_session():
     session.clear()
     session["csrf_token"] = uuid4().hex
+
+def log_event(level, message, username=None):
+    ip = request.remote_addr
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = f"{timestamp} Client IP: {ip}, User: {username or "N/A"} | {message}"
+    if level == "info":
+        logging.info(log_message)
+    elif level == "warning":
+        logging.warning(log_message)
 
 @login_manager.user_loader
 def load_user(user_id):
