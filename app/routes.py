@@ -26,6 +26,11 @@ def login():
             return redirect(url_for('main.dashboard'))
         else:
             flash("Login credentials are invalid, please try again")
+    elif request.method == "POST":
+        flash("Validation Failed")
+        for field, errors in form.errors.items():
+            for i in errors:
+                flash(f"{field} - {i}", category="warning")
     return render_template('login.html', form=form)
 
 
