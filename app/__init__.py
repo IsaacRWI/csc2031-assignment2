@@ -81,6 +81,26 @@ def create_app(config=None):
     from .routes import main
     app.register_blueprint(main)
 
+    @app.after_request
+    def apply_security_headers(response):  # had no idea how to do it, tried to do it through talisman but couldnt get it working so i had to ask ai how to implement it
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' https://cdn.jsdelivr.net; "
+            "style-src 'self' https://cdn.jsdelivr.net; "
+            "img-src 'self' data:; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "frame-ancestors 'none'; "
+            "form-action 'self';"
+        )
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        response.headers["Server"] = "SecureServer"
+        return response
+
     with app.app_context():
         from .models import User, Role, roles_users
         user_datastore.user_model = User
