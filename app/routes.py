@@ -19,6 +19,17 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data.strip()).first() if form.username.data else None
+        if not user:
+            form.username.errors.append("No account matching that email has been registered")
+            lst = []
+            flash("Validation Failed")
+            for field, errors in form.errors.items():
+                for i in errors:
+                    val_error = f"{field} - {i}"
+                    flash(val_error, category="warning")
+                    lst.append(val_error)
+            log_event("warning", f"Failed login attempted, validation error | {lst}", form.username.data)
+            return render_template('login.html', form=form)
         if user.check_password(form.password.data):
             regenerate_session()
             login_user(user)
