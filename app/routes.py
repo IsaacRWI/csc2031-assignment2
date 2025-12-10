@@ -114,11 +114,11 @@ def change_password():
         user = User.query.filter_by(username=current_user.username.strip()).first()
         user.hash_password(form.new_password.data)
         db.session.commit()
-        flash('Password changed successfully', 'success')
         log_event("info", "Password changed successfully", current_user.username)
         log_event("info", "Logged out user", current_user.username)
         session.clear()
         logout_user()
+        flash('Password changed successfully', 'success')
         return redirect(url_for('main.login'))
     elif request.method == "POST":
         lst = []
