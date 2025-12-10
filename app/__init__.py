@@ -115,22 +115,28 @@ def create_app(config=None):
     # custom error handlers
     @app.errorhandler(403)
     def forbidden(e):
-        log_event("warning", f"Error 403 attempted access without proper permission | {request.url}", current_user.username)
+        username = current_user.username if current_user.is_authenticated else "N/A"
+        log_event("warning", f"Error 403 attempted access without proper permission | {request.url}", username)
         return render_template("403_forbidden.html"), 403
 
     @app.errorhandler(400)
     def bad_request(e):
-        log_event("error", f"Error 400 bad request | {request.url}", current_user.username)
+        username = current_user.username if current_user.is_authenticated else "N/A"
+        log_event("error", f"Error 400 bad request | {request.url}", username)
         return render_template("400_bad_request.html"), 400
 
     @app.errorhandler(404)
     def not_found(e):
-        log_event("error", f"Error 404 page not found | {request.url}", current_user.username)
+        if request.path == "/favicon.ico":
+            return render_template("404_not_found.html"), 404
+        username = current_user.username if current_user.is_authenticated else "N/A"
+        log_event("error", f"Error 404 page not found | {request.url}", username)
         return render_template("404_not_found.html"), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        log_event("error", f"Error 500 internal server error | {request.url}", current_user.username)
+        username = current_user.username if current_user.is_authenticated else "N/A"
+        log_event("error", f"Error 500 internal server error | {request.url}", username)
         return render_template("500_internal_server_error.html"), 500
     return app
 
