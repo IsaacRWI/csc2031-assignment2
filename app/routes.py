@@ -19,7 +19,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data.strip()).first() if form.username.data else None
-        if not user:
+        if not user:  # if user is None ie no account matches that email
             form.username.errors.append("No account matching that email has been registered")
             lst = []
             flash("Validation Failed")
@@ -30,7 +30,7 @@ def login():
                     lst.append(val_error)
             log_event("warning", f"Failed login attempted, validation error | {lst}", form.username.data)
             return render_template('login.html', form=form)
-        if user.check_password(form.password.data):
+        if user.check_password(form.password.data):  # hashes input and compares it to stored password hash with bcrypt
             regenerate_session()
             login_user(user)
             log_event("info", "Successful login", current_user.username)
@@ -117,6 +117,7 @@ def change_password():
         flash('Password changed successfully', 'success')
         log_event("info", "Password changed successfully", current_user.username)
         log_event("info", "Logged out user", current_user.username)
+        session.clear()
         logout_user()
         return redirect(url_for('main.login'))
     elif request.method == "POST":
