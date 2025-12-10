@@ -8,6 +8,10 @@ class Config:
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SECURITY_PASSWORD_HASH = "plaintext"  # tells flask security too not to hash the password automatically so i can do it myself
+    WTF_CSRF_ENABLED = True
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+    X_FRAME_OPTIONS = "DENY"
+    X_CONTENT_TYPE_OPTIONS = "nosniff"
 
 class DevelopmentConfig(Config):
     DEBUG = True
